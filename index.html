@@ -1,54 +1,76 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matrix Fitness Performance ClimbMill Floor Calculator</title>
+  <title>Matrix ClimbMill Calculator</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
       background-color: #f0f4f8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
     .calculator {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
       max-width: 400px;
-      width: 100%;
     }
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       margin-bottom: 1rem;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
     }
     input[type="number"] {
       width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
+      padding: 0.75rem;
       font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
     button {
-      padding: 0.5rem 1rem;
+      width: 100%;
+      padding: 0.75rem;
       font-size: 1rem;
       background-color: #0077cc;
-      color: white;
+      color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
     button:hover {
       background-color: #005fa3;
     }
     .result {
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       font-size: 1.2rem;
+      text-align: center;
+    }
+
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 1.1rem;
+      }
+      .result {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
@@ -69,7 +91,7 @@
         return;
       }
 
-      const stepHeightMeters = 0.203; // 20.3 cm in metres
+      const stepHeightMeters = 0.203;
       const stepsPerFloor = 16;
 
       const totalSteps = Math.round(heightInput / stepHeightMeters);
