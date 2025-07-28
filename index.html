@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matrix ClimbMill Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrix ClimbMill & Recovery Pace Calculators</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,11 +12,10 @@
       font-family: Arial, sans-serif;
       background-color: #f0f4f8;
       margin: 0;
-      padding: 0;
+      padding: 2rem 1rem;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      min-height: 100vh;
     }
     .calculator {
       background-color: #ffffff;
@@ -25,8 +24,9 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 90%;
       max-width: 400px;
+      margin-bottom: 2rem;
     }
-    h1 {
+    h1, h2 {
       font-size: 1.3rem;
       margin-bottom: 1rem;
       text-align: center;
@@ -43,6 +43,13 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       margin-bottom: 1rem;
+    }
+    .inline-inputs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .inline-inputs input {
+      flex: 1;
     }
     button {
       width: 100%;
@@ -63,9 +70,8 @@
       font-size: 1.2rem;
       text-align: center;
     }
-
     @media (max-width: 400px) {
-      h1 {
+      h1, h2 {
         font-size: 1.1rem;
       }
       .result {
@@ -75,19 +81,34 @@
   </style>
 </head>
 <body>
+
+  <!-- Matrix ClimbMill Calculator -->
   <div class="calculator">
     <h1>Matrix Fitness Performance ClimbMill Floor Calculator</h1>
     <label for="heightInput">Enter height in metres:</label>
-    <input type="number" id="heightInput" step="0.01" placeholder="e.g. 10" />
+    <input type="number" id="heightInput" step="0.01" placeholder="e.g. 10" min="0.01" />
     <button onclick="calculateSteps()">Calculate</button>
-    <div class="result" id="result"></div>
+    <div class="result" id="resultSteps"></div>
+  </div>
+
+  <!-- Recovery Pace Calculator -->
+  <div class="calculator">
+    <h2>Recover Pace Calculator</h2>
+    <label>Enter your 5K time:</label>
+    <div class="inline-inputs">
+      <input type="number" id="hours" placeholder="Hours" min="0" />
+      <input type="number" id="minutes" placeholder="Minutes" min="0" max="59" />
+      <input type="number" id="seconds" placeholder="Seconds" min="0" max="59" />
+    </div>
+    <button onclick="calculateRecoveryPace()">Calculate</button>
+    <div class="result" id="resultPace"></div>
   </div>
 
   <script>
     function calculateSteps() {
       const heightInput = parseFloat(document.getElementById("heightInput").value);
       if (isNaN(heightInput) || heightInput <= 0) {
-        document.getElementById("result").textContent = "Please enter a valid height in metres.";
+        document.getElementById("resultSteps").textContent = "Please enter a valid height in metres.";
         return;
       }
 
@@ -97,7 +118,41 @@
       const totalSteps = Math.round(heightInput / stepHeightMeters);
       const totalFloors = Math.round(totalSteps / stepsPerFloor);
 
-      document.getElementById("result").textContent = `${totalSteps} steps ≈ ${totalFloors} floors on the ClimbMill.`;
+      document.getElementById("resultSteps").textContent = `${totalSteps} steps ≈ ${totalFloors} floors on the ClimbMill.`;
+    }
+
+    function formatPace(timeInMinutes) {
+      const minutes = Math.floor(timeInMinutes);
+      const seconds = Math.round((timeInMinutes - minutes) * 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')} min`;
+    }
+
+    function calculateRecoveryPace() {
+      const h = parseInt(document.getElementById("hours").value) || 0;
+      const m = parseInt(document.getElementById("minutes").value) || 0;
+      const s = parseInt(document.getElementById("seconds").value) || 0;
+
+      const totalSeconds = h * 3600 + m * 60 + s;
+      if (totalSeconds <= 0) {
+        document.getElementById("resultPace").textContent = "Please enter a valid 5K time.";
+        return;
+      }
+
+      const timeInMinutes = totalSeconds / 60;
+      const fiveKInMiles = 3.10686;
+      const fiveKInKm = 5;
+
+      const pacePerMile = timeInMinutes / fiveKInMiles;
+      const pacePerKm = timeInMinutes / fiveKInKm;
+
+      const recoveryPaceMile = pacePerMile * 1.5;
+      const recoveryPaceKm = pacePerKm * 1.5;
+
+      const formattedMile = formatPace(recoveryPaceMile);
+      const formattedKm = formatPace(recoveryPaceKm);
+
+      document.getElementById("resultPace").textContent =
+        `Recommended recovery pace:\n${formattedMile} per mile | ${formattedKm} per km`;
     }
   </script>
 </body>
