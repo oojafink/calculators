@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Matrix ClimbMill & Recovery Pace Calculators</title>
+  <title>ClimbMill & Recovery Pace Calculators</title>
   <style>
     * {
       box-sizing: border-box;
@@ -86,15 +86,20 @@
   <!-- Matrix ClimbMill Calculator -->
   <div class="calculator">
     <h1>Matrix Fitness Performance ClimbMill Floor Calculator</h1>
-    <label for="heightInput">Enter height in metres:</label>
+    <label for="heightInput">Enter height climbed in metres:</label>
     <input type="number" id="heightInput" step="0.01" placeholder="e.g. 10" min="0.01" />
-    <button onclick="calculateSteps()">Calculate</button>
+    <button onclick="calculateSteps()">Convert to Floors</button>
+
+    <label for="floorInput">Or enter number of floors completed:</label>
+    <input type="number" id="floorInput" step="1" placeholder="e.g. 20" min="1" />
+    <button onclick="calculateHeight()">Convert to Metres</button>
+
     <div class="result" id="resultSteps"></div>
   </div>
 
   <!-- Recovery Pace Calculator -->
   <div class="calculator">
-    <h2>Recover Pace Calculator</h2>
+    <h2>Recovery Pace Calculator</h2>
     <label>Enter your 5K time:</label>
     <div class="inline-inputs">
       <input type="number" id="hours" placeholder="Hours" min="0" />
@@ -106,6 +111,9 @@
   </div>
 
   <script>
+    const stepHeightMeters = 0.203;
+    const stepsPerFloor = 16;
+
     function calculateSteps() {
       const heightInput = parseFloat(document.getElementById("heightInput").value);
       if (isNaN(heightInput) || heightInput <= 0) {
@@ -113,55 +121,26 @@
         return;
       }
 
-      const stepHeightMeters = 0.203;
-      const stepsPerFloor = 16;
-
       const totalSteps = Math.round(heightInput / stepHeightMeters);
       const totalFloors = Math.round(totalSteps / stepsPerFloor);
 
       document.getElementById("resultSteps").textContent = `${totalSteps} steps ≈ ${totalFloors} floors on the ClimbMill.`;
     }
 
-    function formatPace(timeInMinutes) {
-      const minutes = Math.floor(timeInMinutes);
-      const seconds = Math.round((timeInMinutes - minutes) * 60);
-      return `${minutes}:${seconds.toString().padStart(2, '0')} min`;
-    }
-
-    function calculateRecoveryPace() {
-      const h = parseInt(document.getElementById("hours").value) || 0;
-      const m = parseInt(document.getElementById("minutes").value) || 0;
-      const s = parseInt(document.getElementById("seconds").value) || 0;
-
-      const totalSeconds = h * 3600 + m * 60 + s;
-      if (totalSeconds <= 0) {
-        document.getElementById("resultPace").textContent = "Please enter a valid 5K time.";
+    function calculateHeight() {
+      const floorInput = parseInt(document.getElementById("floorInput").value);
+      if (isNaN(floorInput) || floorInput <= 0) {
+        document.getElementById("resultSteps").textContent = "Please enter a valid number of floors.";
         return;
       }
 
-      const totalMinutes = totalSeconds / 60;
-      const fiveKInKm = 5;
-      const fiveKInMiles = 3.10686;
+      const totalSteps = floorInput * stepsPerFloor;
+      const totalHeight = (totalSteps * stepHeightMeters).toFixed(2);
 
-      const pacePerKm = totalMinutes / fiveKInKm;
-      const pacePerMile = totalMinutes / fiveKInMiles;
-
-      // Apply 130% to 145% of 5K pace
-      const rangeMinKm = pacePerKm * 1.3;
-      const rangeMaxKm = pacePerKm * 1.45;
-      const rangeMinMile = pacePerMile * 1.3;
-      const rangeMaxMile = pacePerMile * 1.45;
-
-      const formattedKmMin = formatPace(rangeMinKm);
-      const formattedKmMax = formatPace(rangeMaxKm);
-      const formattedMileMin = formatPace(rangeMinMile);
-      const formattedMileMax = formatPace(rangeMaxMile);
-
-      document.getElementById("resultPace").textContent =
-        `Recommended recovery pace:\n` +
-        `${formattedKmMin} – ${formattedKmMax} per km\n` +
-        `${formattedMileMin} – ${formattedMileMax} per mile`;
+      document.getElementById("resultSteps").textContent = `${floorInput} floors ≈ ${totalHeight} metres climbed.`;
     }
-  </script>
-</body>
-</html>
+
+    function formatPace(timeInMinutes) {
+      const minutes = Math.floor(timeInMinutes);
+      const seconds = Math.round((timeInMinutes - minutes) * 60);
+      return `${minutes}:${seconds.toStri
