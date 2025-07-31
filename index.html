@@ -146,6 +146,14 @@
 
     <div class="result" id="resultPace"></div>
   </div>
+  
+<!-- Add this block after the existing calculators -->
+<h3>🥾 Trail Running Equivalent Distance</h3>
+<label>Actual Distance (km): <input type="number" id="trailDistance" step="0.01"></label><br>
+<label>Total Ascent (m): <input type="number" id="ascent"></label><br>
+<label>Conversion Factor (km per m ascent, default 0.01): <input type="number" id="conversionFactor" step="0.001" value="0.01"></label><br>
+<button onclick="calculateTrailEffort()">Calculate Flat‑Equivalent Distance</button>
+<p>Flat‑equivalent distance: <strong id="flatEquivalent">0</strong> km</p>
 
   <script>
     const stepHeightMeters = 0.203;
@@ -250,6 +258,16 @@
       localStorage.removeItem('minutes');
       localStorage.removeItem('seconds');
     }
+
+function calculateTrailEffort() {
+  const distance = parseFloat(document.getElementById('trailDistance').value) || 0;
+  const ascent = parseFloat(document.getElementById('ascent').value) || 0;
+  const conversionFactor = parseFloat(document.getElementById('conversionFactor').value) || 0.01;
+  const equivalent = distance + (ascent * conversionFactor);
+  document.getElementById('flatEquivalent').innerText = equivalent.toFixed(2);
+}
+
+    
   </script>
 </body>
 </html>
