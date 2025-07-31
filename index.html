@@ -1,134 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fitness Calculators</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ClimbMill, Recovery & Trail Effort Calculators</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .tabs { overflow: hidden; }
-    .tablink {
-      background-color: #f1f1f1;
-      float: left;
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 1rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-button {
+      padding: 0.75rem 1.25rem;
       border: none;
-      outline: none;
+      border-radius: 8px;
+      background-color: #e0e0e0;
       cursor: pointer;
-      padding: 14px 16px;
-      transition: 0.3s;
-      font-size: 17px;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
     }
-    .tablink:hover { background-color: #ddd; }
-    .tabcontent {
+    .tab-button.active {
+      background-color: #0077cc;
+      color: white;
+    }
+
+    .calculator {
       display: none;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-top: none;
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
     }
-    input[type=number], input[type=submit] {
+    .calculator.active {
       display: block;
-      margin-bottom: 10px;
-      padding: 8px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 300px;
     }
-    label { margin-top: 10px; display: block; }
+
+    h1, h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .inline-inputs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .inline-inputs input {
+      flex: 1;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background-color: #0077cc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 0.5rem;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    .result {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+      white-space: pre-line;
+    }
+    @media (max-width: 400px) {
+      h1, h2 {
+        font-size: 1.1rem;
+      }
+      .result {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Fitness Calculators</h1>
 
+  <!-- Tabs -->
   <div class="tabs">
-    <button class="tablink" onclick="openTab(event, 'climbmill')">ClimbMill</button>
-    <button class="tablink" onclick="openTab(event, 'recovery')">Recovery Pace</button>
-    <button class="tablink" onclick="openTab(event, 'trail')">Trail Effort</button>
+    <button class="tab-button active" onclick="switchTab('climb')">ClimbMill Calculator</button>
+    <button class="tab-button" onclick="switchTab('recovery')">Recovery Pace Calculator</button>
+    <button class="tab-button" onclick="switchTab('trail')">Trail Effort Calculator</button>
   </div>
 
-  <div id="climbmill" class="tabcontent">
-    <h3>ClimbMill Calculator</h3>
-    <form onsubmit="calculateClimbMill(); return false;">
-      <label for="floors">Floors Climbed:</label>
-      <input type="number" id="floors" name="floors" required>
+  <!-- ClimbMill Calculator -->
+  <div id="climb" class="calculator active">
+    <h2>Matrix Fitness Performance ClimbMill Floor Calculator</h2>
+    <label for="heightInput">Enter height climbed in metres:</label>
+    <input type="number" id="heightInput" step="0.01" placeholder="e.g. 10" min="0.01" />
 
-      <label for="minutes">Time (minutes):</label>
-      <input type="number" id="minutes" name="minutes" required>
+    <button onclick="calculateSteps()">Convert to Floors</button>
 
-      <input type="submit" value="Calculate">
-    </form>
-    <p><strong>Floors per minute:</strong> <span id="floorsPerMinute">–</span></p>
+    <label for="floorInput">Or enter number of floors completed:</label>
+    <input type="number" id="floorInput" step="1" placeholder="e.g. 20" min="1" />
+
+    <button onclick="calculateHeight()">Convert to Metres</button>
+    <button onclick="resetClimbMill()">Reset</button>
+
+    <div class="result" id="resultSteps"></div>
   </div>
 
-  <div id="recovery" class="tabcontent">
-    <h3>Recovery Pace Calculator</h3>
-    <form onsubmit="calculateRecoveryPace(); return false;">
-      <label for="distance">Distance (km):</label>
-      <input type="number" id="distance" name="distance" step="0.01" required>
+  <!-- Recovery Pace Calculator -->
+  <div id="recovery" class="calculator">
+    <h2>Recovery Pace Calculator</h2>
+    <label>Enter your 5K time:</label>
+    <div class="inline-inputs">
+      <input type="number" id="hours" placeholder="Hours" min="0" />
+      <input type="number" id="minutes" placeholder="Minutes" min="0" max="59" />
+      <input type="number" id="seconds" placeholder="Seconds" min="0" max="59" />
+    </div>
 
-      <label for="timeHours">Time (hours):</label>
-      <input type="number" id="timeHours" name="timeHours" required>
+    <button onclick="calculateRecoveryPace()">Calculate</button>
+    <button onclick="resetRecovery()">Reset</button>
 
-      <input type="submit" value="Calculate">
-    </form>
-    <p><strong>Pace (min/km):</strong> <span id="recoveryPace">–</span></p>
+    <div class="result" id="resultPace"></div>
   </div>
 
-  <div id="trail" class="tabcontent">
-    <h3>Trail Effort Calculator</h3>
-    <form onsubmit="calculateTrailEffort(); return false;">
-      <label for="trailDistance">Distance (km):</label>
-      <input type="number" id="trailDistance" name="trailDistance" step="0.01" required>
+  <!-- Trail Effort Calculator -->
+  <div id="trail" class="calculator">
+    <h2>Trail Effort Calculator</h2>
+    <label for="trailDistance">Enter horizontal distance (km):</label>
+    <input type="number" id="trailDistance" step="0.01" placeholder="e.g. 12.5" min="0" />
 
-      <label for="ascent">Ascent (m):</label>
-      <input type="number" id="ascent" name="ascent" required>
+    <label for="ascent">Enter total ascent (m):</label>
+    <input type="number" id="ascent" step="1" placeholder="e.g. 600" min="0" />
 
-      <label for="conversionFactor">Conversion factor (default = 0.01):</label>
-      <input type="number" id="conversionFactor" name="conversionFactor" step="0.001" value="0.01" required>
+    <label for="conversionFactor">Conversion factor (default is 0.01):</label>
+    <input type="number" id="conversionFactor" step="0.001" value="0.01" min="0" />
 
-      <input type="submit" value="Calculate">
-    </form>
-    <p><strong>Flat-equivalent distance:</strong> <span id="flatEquivalent">–</span> km</p>
+    <button onclick="calculateTrailEffort()">Calculate</button>
+    <button onclick="resetTrail()">Reset</button>
+
+    <div class="result" id="resultTrail"></div>
   </div>
 
   <script>
-    function openTab(evt, tabName) {
-      var i, tabcontent, tablinks;
-      tabcontent = document.getElementsByClassName("tabcontent");
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-      }
-      tablinks = document.getElementsByClassName("tablink");
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-      }
-      document.getElementById(tabName).style.display = "block";
-      evt.currentTarget.className += " active";
+    const stepHeightMeters = 0.203;
+    const stepsPerFloor = 16;
+
+    window.onload = () => {
+      document.getElementById('heightInput').value = localStorage.getItem('heightInput') || '';
+      document.getElementById('floorInput').value = localStorage.getItem('floorInput') || '';
+      document.getElementById('hours').value = localStorage.getItem('hours') || '';
+      document.getElementById('minutes').value = localStorage.getItem('minutes') || '';
+      document.getElementById('seconds').value = localStorage.getItem('seconds') || '';
+      document.getElementById('trailDistance').value = localStorage.getItem('trailDistance') || '';
+      document.getElementById('ascent').value = localStorage.getItem('ascent') || '';
+      document.getElementById('conversionFactor').value = localStorage.getItem('conversionFactor') || '0.01';
+    };
+
+    function switchTab(tab) {
+      document.querySelectorAll('.calculator').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+      document.querySelector(`.tab-button[onclick*="${tab}"]`).classList.add('active');
     }
 
-    // Default open
-    document.addEventListener("DOMContentLoaded", function() {
-      document.querySelector(".tablink").click();
-    });
+    function calculateSteps() {
+      const heightInput = parseFloat(document.getElementById("heightInput").value);
+      if (isNaN(heightInput) || heightInput <= 0) {
+        document.getElementById("resultSteps").textContent = "Please enter a valid height in metres.";
+        return;
+      }
 
-    function calculateClimbMill() {
-      const floors = parseFloat(document.getElementById('floors').value);
-      const minutes = parseFloat(document.getElementById('minutes').value);
-      const rate = floors / minutes;
-      document.getElementById('floorsPerMinute').innerText = rate.toFixed(2);
+      const totalSteps = Math.round(heightInput / stepHeightMeters);
+      const totalFloors = Math.round(totalSteps / stepsPerFloor);
+
+      localStorage.setItem('heightInput', heightInput);
+      document.getElementById("resultSteps").textContent = `${totalSteps} steps ≈ ${totalFloors} floors on the ClimbMill.`;
+    }
+
+    function calculateHeight() {
+      const floorInput = parseInt(document.getElementById("floorInput").value);
+      if (isNaN(floorInput) || floorInput <= 0) {
+        document.getElementById("resultSteps").textContent = "Please enter a valid number of floors.";
+        return;
+      }
+
+      const totalSteps = floorInput * stepsPerFloor;
+      const totalHeight = (totalSteps * stepHeightMeters).toFixed(2);
+
+      localStorage.setItem('floorInput', floorInput);
+      document.getElementById("resultSteps").textContent = `${floorInput} floors ≈ ${totalHeight} metres climbed.`;
+    }
+
+    function resetClimbMill() {
+      document.getElementById("heightInput").value = '';
+      document.getElementById("floorInput").value = '';
+      document.getElementById("resultSteps").textContent = '';
+      localStorage.removeItem('heightInput');
+      localStorage.removeItem('floorInput');
+    }
+
+    function formatPace(timeInMinutes) {
+      const minutes = Math.floor(timeInMinutes);
+      const seconds = Math.round((timeInMinutes - minutes) * 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')} min`;
     }
 
     function calculateRecoveryPace() {
-      const distance = parseFloat(document.getElementById('distance').value);
-      const timeHours = parseFloat(document.getElementById('timeHours').value);
-      const pace = (timeHours * 60) / distance;
-      document.getElementById('recoveryPace').innerText = pace.toFixed(2);
+      const h = Math.max(0, parseInt(document.getElementById("hours").value) || 0);
+      const m = Math.min(59, Math.max(0, parseInt(document.getElementById("minutes").value) || 0));
+      const s = Math.min(59, Math.max(0, parseInt(document.getElementById("seconds").value) || 0));
+
+      const totalSeconds = h * 3600 + m * 60 + s;
+      if (totalSeconds <= 0) {
+        document.getElementById("resultPace").textContent = "Please enter a valid 5K time.";
+        return;
+      }
+
+      const totalMinutes = totalSeconds / 60;
+      const pacePerKm = totalMinutes / 5;
+      const pacePerMile = totalMinutes / 3.10686;
+
+      const rangeMinKm = pacePerKm * 1.3;
+      const rangeMaxKm = pacePerKm * 1.45;
+      const rangeMinMile = pacePerMile * 1.3;
+      const rangeMaxMile = pacePerMile * 1.45;
+
+      const formattedKmMin = formatPace(rangeMinKm);
+      const formattedKmMax = formatPace(rangeMaxKm);
+      const formattedMileMin = formatPace(rangeMinMile);
+      const formattedMileMax = formatPace(rangeMaxMile);
+
+      localStorage.setItem('hours', h);
+      localStorage.setItem('minutes', m);
+      localStorage.setItem('seconds', s);
+
+      document.getElementById("resultPace").textContent =
+        `Recommended recovery pace:\n${formattedKmMin} – ${formattedKmMax} per km\n${formattedMileMin} – ${formattedMileMax} per mile`;
+    }
+
+    function resetRecovery() {
+      document.getElementById("hours").value = '';
+      document.getElementById("minutes").value = '';
+      document.getElementById("seconds").value = '';
+      document.getElementById("resultPace").textContent = '';
+      localStorage.removeItem('hours');
+      localStorage.removeItem('minutes');
+      localStorage.removeItem('seconds');
     }
 
     function calculateTrailEffort() {
-      const distance = parseFloat(document.getElementById('trailDistance').value) || 0;
-      const ascent = parseFloat(document.getElementById('ascent').value) || 0;
-      const conversionFactor = parseFloat(document.getElementById('conversionFactor').value) || 0.01;
-      const flatEquivalent = distance + (ascent * conversionFactor);
-      document.getElementById('flatEquivalent').innerText = flatEquivalent.toFixed(2);
+      const distance = parseFloat(document.getElementById("trailDistance").value);
+      const ascent = parseFloat(document.getElementById("ascent").value);
+      const factor = parseFloat(document.getElementById("conversionFactor").value);
+
+      if (isNaN(distance) || isNaN(ascent) || isNaN(factor)) {
+        document.getElementById("resultTrail").textContent = "Please enter valid values.";
+        return;
+      }
+
+      const flatEquivalent = distance + (ascent * factor);
+      localStorage.setItem('trailDistance', distance);
+      localStorage.setItem('ascent', ascent);
+      localStorage.setItem('conversionFactor', factor);
+
+      document.getElementById("resultTrail").textContent =
+        `${flatEquivalent.toFixed(2)} km flat-equivalent distance.`;
+    }
+
+    function resetTrail() {
+      document.getElementById("trailDistance").value = '';
+      document.getElementById("ascent").value = '';
+      document.getElementById("conversionFactor").value = '0.01';
+      document.getElementById("resultTrail").textContent = '';
+      localStorage.removeItem('trailDistance');
+      localStorage.removeItem('ascent');
+      localStorage.removeItem('conversionFactor');
     }
   </script>
 </body>
